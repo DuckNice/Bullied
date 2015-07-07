@@ -1,60 +1,61 @@
 ﻿using UnityEngine;
-using System.Collections;
 
-public class Player : MonoBehaviour {
+public class Player : MonoBehaviour
+{
+    public float CenterTolerance;
+    private Vector3 _direction = new Vector3(0, 0, 0);
+    public float FallSpeed;
+    public int HurtDivisor = 2;
+    private GameObject _lastBullyHit;
+    private bool _playerControl = true;
+    public float PlayerSpeed;
+    public LevelSetup Refe;
 
-	private bool playerControl = true;
-	private Vector3 direction = new Vector3(0, 0, 0);
-	private Vector3 hitPosition = new Vector3(0, 0, 0);
-	private GameObject lastBullyHit;
-	public float playerSpeed;
-	private float currentSpeed;
-	public float fallSpeed;
-	public float centerTolerance;
-	public LevelSetup refe;
-	public int hurtDivisor = 2;
+    public bool HitBully(Vector2 bullyPosition, bool sameBully)
+    {
+        if (_playerControl || !sameBully)
+        {
+            _playerControl = false;
 
-	public bool HitBully(Vector2 bullyPosition, bool sameBully){
-		if(playerControl || !sameBully){
-			playerControl = false;
+            _direction = Vector3.zero - transform.position;
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            GetComponent<Rigidbody>().velocity = (_direction*FallSpeed);
 
-			direction = Vector3.zero - transform.position;
-			GetComponent<Rigidbody>().velocity = Vector3.zero;
-			GetComponent<Rigidbody>().velocity = (direction * fallSpeed);
-			hitPosition = bullyPosition;
+            return true;
+        }
 
-			return true;
-		}
+        return false;
+    }
 
-		return false;
-	}
 
-	void Start(){
-		currentSpeed = playerSpeed;
-	}
+    // Update is called once per frame
+    private void Update()
+    {
+        if (_playerControl)
+        {
+            var x = Input.GetAxis("Horizontal");
+            var y = Input.GetAxis("Vertical");
+            var offset = (new Vector3(x, y, 0)*PlayerSpeed/((Refe.Step + HurtDivisor)/HurtDivisor)*Time.deltaTime);
 
-	// Update is called once per frame
-	void Update () {
-		if (playerControl) {
-			float x = Input.GetAxis ("Horizontal");
-			float y = Input.GetAxis ("Vertical");
-			Vector3 offset = (new Vector3(x, y, 0) * playerSpeed / ((refe.step + hurtDivisor) / hurtDivisor) * Time.deltaTime);
+            transform.position += offset;
+        }
+        else
+        {
+            if ( /*Vector3.Distance(rigidbody.position, Vector3.zero) < centerTolerance || */
+                GetComponent<Rigidbody>().velocity.magnitude < 0.5f)
+            {
+                _playerControl = true;
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+            }
+        }
+    }
 
-			transform.position += offset;
-		}
-		else {
-
-			if(/*Vector3.Distance(rigidbody.position, Vector3.zero) < centerTolerance || */GetComponent<Rigidbody>().velocity.magnitude < 0.5f){
-				playerControl = true;
-				GetComponent<Rigidbody>().velocity = Vector3.zero;
-			}
-		}
-	}
-
-	void OnTriggerStay(Collider bully)
-	{
-		if(HitBully (new Vector2(bully.transform.position.x, bully.transform.position.y), bully.gameObject == lastBullyHit)){
-			lastBullyHit = bully.gameObject;
-		}
-	}
+    private void OnTriggerStay(Collider bully)
+    {
+        if (HitBully(new Vector2(bully.transform.position.x, bully.transform.position.y),
+            bully.gameObject == _lastBullyHit))
+        {
+            _lastBullyHit = bully.gameObject;
+        }
+    }
 }
