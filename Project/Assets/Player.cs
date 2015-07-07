@@ -27,7 +27,7 @@ public class Player : MonoBehaviour
         return false;
     }
 
-
+    /*
     // Update is called once per frame
     private void Update()
     {
@@ -41,7 +41,7 @@ public class Player : MonoBehaviour
         }
         else
         {
-            if ( /*Vector3.Distance(rigidbody.position, Vector3.zero) < centerTolerance || */
+            if (
                 GetComponent<Rigidbody>().velocity.magnitude < 0.5f)
             {
                 _playerControl = true;
@@ -49,7 +49,7 @@ public class Player : MonoBehaviour
             }
         }
     }
-
+    */
     private void OnTriggerStay(Collider bully)
     {
         if (HitBully(new Vector2(bully.transform.position.x, bully.transform.position.y),

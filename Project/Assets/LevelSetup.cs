@@ -5,6 +5,9 @@ using UnityEngine;
 public class LevelSetup : MonoBehaviour
 {
     private readonly List<GameObject> _unitPrefabs = new List<GameObject>();
+
+    public List<Vector2> BullyPositions{get; private set;}
+
     public float AttackSpeed;
     public float AttackTolerance;
     private float _circlePiece;
@@ -13,7 +16,8 @@ public class LevelSetup : MonoBehaviour
     private float _nextStep;
     public GameObject Player;
     private float _radiansEachUnit;
-    public float Radius = 6.0f;
+    private float _radius;
+    public float RadiusScreenFactor = 1;
 
     [HideInInspector] public int Step;
 
@@ -25,11 +29,24 @@ public class LevelSetup : MonoBehaviour
     public GameObject UnitPrefab;
     public List<float> UnitsScale = new List<float>();
 
+    private void OnEnable()
+    {
+        BullyPositions = new List<Vector2>();
+
+        for (var i = UnitsScale.Count - 1; i >= 0; i--)
+        {
+            BullyPositions.Add( UnitPosition(i));
+        }
+
+        Vector3 dimensions = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
+        _radius = (dimensions.x < dimensions.y) ? (dimensions.x / 2) * RadiusScreenFactor : (dimensions.y / 2) * RadiusScreenFactor; 
+    }
+
     private void Start()
     {
-        _lengthOfStep = Radius/Steps;
+        _lengthOfStep = _radius / Steps;
         _nextStep = TimeBetweenSteps;
-        _currentRadius = Radius;
+        _currentRadius = _radius;
         float radians = 0;
         _radiansEachUnit = (2*Mathf.PI)/UnitsScale.Count;
         CalculateCirclePiece();
@@ -61,7 +78,7 @@ public class LevelSetup : MonoBehaviour
             _currentRadius -= (StepSpeed*Time.deltaTime);
             CalculateCirclePiece();
         }
-
+        /*
         for (var i = 0; i < _unitPrefabs.Count; i++)
         {
             if (Vector3.Distance(UnitPosition(i), Player.transform.position) < _circlePiece + AttackTolerance)
@@ -84,15 +101,15 @@ public class LevelSetup : MonoBehaviour
                 }
             }
         }
-
-        if (_currentRadius <= Radius - (_lengthOfStep*Step))
+        */
+        if (_currentRadius <= _radius - (_lengthOfStep * Step))
         {
             _stepping = false;
         }
 
         if (Step >= Steps)
         {
-            Invoke("EndGame", 0.1f);
+         //   Invoke("EndGame", 0.1f);
         }
     }
 
