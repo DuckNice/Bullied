@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
     public float PlayerSpeed;
     public LevelSetup Refe;
 
+
     public bool HitBully(Vector2 bullyPosition, bool sameBully)
     {
         if (_playerControl || !sameBully)
@@ -27,7 +28,7 @@ public class Player : MonoBehaviour
         return false;
     }
 
-    /*
+    
     // Update is called once per frame
     private void Update()
     {
@@ -35,27 +36,34 @@ public class Player : MonoBehaviour
         {
             var x = Input.GetAxis("Horizontal");
             var y = Input.GetAxis("Vertical");
-            var offset = (new Vector3(x, y, 0)*PlayerSpeed/((Refe.Step + HurtDivisor)/HurtDivisor)*Time.deltaTime);
+            var offset = (new Vector3(x, y, 0) * PlayerSpeed / ((Refe.CurrentStep + HurtDivisor) / HurtDivisor) * Time.deltaTime);
 
             transform.position += offset;
         }
         else
         {
-            if (
-                GetComponent<Rigidbody>().velocity.magnitude < 0.5f)
+            if (!(GetComponent<Rigidbody>().velocity.magnitude < 0.5f))
             {
-                _playerControl = true;
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                return;
             }
+
+            _playerControl = true;
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
         }
     }
-    */
+    
+
     private void OnTriggerStay(Collider bully)
     {
         if (HitBully(new Vector2(bully.transform.position.x, bully.transform.position.y),
             bully.gameObject == _lastBullyHit))
         {
             _lastBullyHit = bully.gameObject;
+        }
+
+        if (Refe.CurrentStep >= Refe.TotalSteps)
+        {
+            Refe.EndGame();
         }
     }
 }

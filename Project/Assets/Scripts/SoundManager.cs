@@ -11,7 +11,6 @@ public enum MusicTrack
 
 public class SoundManager : MonoBehaviour
 {
-
     [SerializeField]
     public AudioSource IntroSource;
     public AudioSource BuildupSource;
@@ -24,7 +23,8 @@ public class SoundManager : MonoBehaviour
         Invoke("setTrack", 20);
     }
 
-    void setTrack()
+
+    void SetTrack()
     {
         SetMusicTrack(MusicTrack.Buildup);
     }
@@ -34,6 +34,7 @@ public class SoundManager : MonoBehaviour
     {
         StartCoroutine(SwitchSound(newTrack));
     }
+
 
     IEnumerator SwitchSound(MusicTrack newTrack)
     {

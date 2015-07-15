@@ -1,33 +1,30 @@
 ﻿using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 public class LevelSetup : MonoBehaviour
 {
-    private readonly List<GameObject> _unitPrefabs = new List<GameObject>();
+    public delegate void RadiusChangeHandler();
 
-    public List<Vector2> BullyPositions{get; private set;}
+    [SerializeField] private float _radiusScreenFactor = 1;
 
-    public float AttackSpeed;
-    public float AttackTolerance;
-    private float _circlePiece;
-    private float _currentRadius;
     private float _lengthOfStep;
     private float _nextStep;
-    public GameObject Player;
     private float _radiansEachUnit;
     private float _radius;
-    public float RadiusScreenFactor = 1;
-
-    [HideInInspector] public int Step;
-
-    private bool _stepping;
-    public int Steps = 4;
+    public float AttackSpeed;
+    public float AttackTolerance;
+    public GameObject BullyPrefab;
+    public GameObject Player;
+    public int TotalSteps = 4;
     public float StepSpeed;
     public float TimeBetweenSteps;
     public float Tolerance = 0.02f;
-    public GameObject UnitPrefab;
     public List<float> UnitsScale = new List<float>();
+    public float CirclePiece { get; private set; }
+    public float CurrentRadius { get; private set; }
+    public bool GameOn { get; private set; }
+    public int CurrentStep { get; private set; }
+    public List<Vector2> BullyPositions { get; private set; }
 
     private void OnEnable()
     {
@@ -35,105 +32,84 @@ public class LevelSetup : MonoBehaviour
 
         for (var i = UnitsScale.Count - 1; i >= 0; i--)
         {
-            BullyPositions.Add( UnitPosition(i));
+            BullyPositions.Add(UnitCirclePosition(i));
         }
 
-        Vector3 dimensions = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
-        _radius = (dimensions.x < dimensions.y) ? (dimensions.x / 2) * RadiusScreenFactor : (dimensions.y / 2) * RadiusScreenFactor; 
+        _nextStep = TimeBetweenSteps;
     }
 
     private void Start()
     {
-        _lengthOfStep = _radius / Steps;
-        _nextStep = TimeBetweenSteps;
-        _currentRadius = _radius;
-        float radians = 0;
-        _radiansEachUnit = (2*Mathf.PI)/UnitsScale.Count;
-        CalculateCirclePiece();
+        GameOn = true;
 
+        var dimensions = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
+        _radius = (dimensions.x < dimensions.y) ? dimensions.x*_radiusScreenFactor : dimensions.y*_radiusScreenFactor;
+
+        _lengthOfStep = _radius/TotalSteps;
+
+        CurrentRadius = _radius;
+
+        _radiansEachUnit = (2*Mathf.PI)/UnitsScale.Count;
+
+        UpdateCirclePiece();
+
+        Bully.SceneManager = this;
+
+        float radians = 0;
         for (var i = 0; i < UnitsScale.Count; i++)
         {
-            var unit = Instantiate(UnitPrefab);
+            var unit = Instantiate(BullyPrefab);
+            var bullyScript = unit.GetComponent<Bully>();
+            bullyScript.CircleNumber = i;
+            bullyScript.Init();
 
-            unit.transform.position = UnitPosition(i);
+            //TODO: Funktion til at udregne bully's rotation. Flyt til bully script.
             unit.transform.Rotate(new Vector3(0, 0, (Mathf.Rad2Deg*radians)));
-
-            _unitPrefabs.Add(unit);
 
             radians += _radiansEachUnit;
         }
     }
 
+    public event RadiusChangeHandler OnRadiusChanged;
+
     private void Update()
     {
-        if (Time.time > _nextStep)
+        if (GameOn)
         {
-            _stepping = true;
-            Step++;
-            _nextStep += TimeBetweenSteps;
-        }
-
-        if (_stepping)
-        {
-            _currentRadius -= (StepSpeed*Time.deltaTime);
-            CalculateCirclePiece();
-        }
-        /*
-        for (var i = 0; i < _unitPrefabs.Count; i++)
-        {
-            if (Vector3.Distance(UnitPosition(i), Player.transform.position) < _circlePiece + AttackTolerance)
+            if (Time.time > _nextStep)
             {
-                var travel = (Vector3.Distance(UnitPosition(i), _unitPrefabs[i].transform.position) +
-                              (AttackSpeed*Time.deltaTime))/Vector3.Distance(UnitPosition(i), Player.transform.position);
+                CurrentStep++;
+                _nextStep += TimeBetweenSteps;
+                CurrentRadius -= _lengthOfStep;
 
-                _unitPrefabs[i].transform.position = Vector3.Lerp(UnitPosition(i), Player.transform.position, travel);
+                OnRadiusChanged();
+                UpdateCirclePiece();
             }
-            else
-            {
-                if (_stepping)
-                {
-                    _unitPrefabs[i].transform.position = UnitPosition(i);
-                }
-                else if (Vector3.Distance(UnitPosition(i), _unitPrefabs[i].transform.position) > Tolerance)
-                {
-                    _unitPrefabs[i].transform.position += (UnitPosition(i) - _unitPrefabs[i].transform.position)*
-                                                         AttackSpeed*Time.deltaTime;
-                }
-            }
-        }
-        */
-        if (_currentRadius <= _radius - (_lengthOfStep * Step))
-        {
-            _stepping = false;
-        }
-
-        if (Step >= Steps)
-        {
-         //   Invoke("EndGame", 0.1f);
         }
     }
 
-    private void EndGame()
+    public void EndGame()
     {
-        Application.Quit();
+        GameOn = false;
 
-#if UNITY_EDITOR
+/*#if UNITY_EDITOR
         EditorApplication.isPlaying = false;
 #endif
+        Application.Quit();*/
     }
 
-    private Vector3 UnitPosition(int index)
+    public Vector3 UnitCirclePosition(int index)
     {
         var radians = _radiansEachUnit*index;
 
-        var x = Mathf.Cos(radians)*_currentRadius;
-        var y = Mathf.Sin(radians)*_currentRadius;
+        var x = Mathf.Cos(radians)*CurrentRadius;
+        var y = Mathf.Sin(radians)*CurrentRadius;
 
         return new Vector3(x, y, 0);
     }
 
-    private void CalculateCirclePiece()
+    private void UpdateCirclePiece()
     {
-        _circlePiece = ((_currentRadius*2)*Mathf.PI)/(360/(Mathf.Rad2Deg*_radiansEachUnit));
+        CirclePiece = ((CurrentRadius*2)*Mathf.PI)/(360/(Mathf.Rad2Deg*_radiansEachUnit));
     }
 }
