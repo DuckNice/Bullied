@@ -7,7 +7,7 @@ public class Bully : MonoBehaviour
 
 	// Use this for initialization
 	void Start () {
-	    SceneManager.OnRadiusChanged += Go;
+	    SceneManager.OnRadiusChanged += CalculateNewPosition;
 	}
 
     public void Init()
@@ -15,31 +15,38 @@ public class Bully : MonoBehaviour
         transform.position = SceneManager.UnitCirclePosition(CircleNumber);
     }
 
-    void Go()
+    void CalculateNewPosition()
     {
-        Debug.Log("changed to " + SceneManager.CurrentRadius);
+        SceneManager.UnitCirclePosition(CircleNumber);
     }
 
-	void Update () 
+	void Update ()
     {
-        if (
-            Vector3.Distance(SceneManager.UnitCirclePosition(CircleNumber), 
-                            SceneManager.Player.transform.position) 
-            < 
-            SceneManager.CirclePiece + SceneManager.AttackTolerance)
-        {
-            var travel = (Vector3.Distance(SceneManager.UnitCirclePosition(CircleNumber), transform.position) +
-                            (SceneManager.AttackSpeed * Time.deltaTime)) / Vector3.Distance(SceneManager.UnitCirclePosition(CircleNumber), SceneManager.Player.transform.position);
+	    if (LevelSetup.GameOn)
+	    {
+	        if (
+	            Vector3.Distance(SceneManager.UnitCirclePosition(CircleNumber),
+	                SceneManager.Player.transform.position)
+	            <
+	            SceneManager.CirclePiece + SceneManager.AttackTolerance)
+	        {
+	            var travel = (Vector3.Distance(SceneManager.UnitCirclePosition(CircleNumber), transform.position) +
+	                          (SceneManager.AttackSpeed*Time.deltaTime))/
+	                         Vector3.Distance(SceneManager.UnitCirclePosition(CircleNumber),
+	                             SceneManager.Player.transform.position);
 
-            transform.position = Vector3.Lerp(SceneManager.UnitCirclePosition(CircleNumber), SceneManager.Player.transform.position, travel);
-        }
-        else
-        {
-            if (Vector3.Distance(SceneManager.UnitCirclePosition(CircleNumber), transform.position) > SceneManager.Tolerance)
-            {
-                transform.position += (SceneManager.UnitCirclePosition(CircleNumber) - transform.position) *
-                                                        SceneManager.AttackSpeed * Time.deltaTime;
-            }
-        }
-	}
+	            transform.position = Vector3.Lerp(SceneManager.UnitCirclePosition(CircleNumber),
+	                SceneManager.Player.transform.position, travel);
+	        }
+	        else
+	        {
+	            if (Vector3.Distance(SceneManager.UnitCirclePosition(CircleNumber), transform.position) >
+	                SceneManager.Tolerance)
+	            {
+	                transform.position += (SceneManager.UnitCirclePosition(CircleNumber) - transform.position)*
+	                                      SceneManager.AttackSpeed*Time.deltaTime;
+	            }
+	        }
+	    }
+    }
 }

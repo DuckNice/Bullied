@@ -21,8 +21,7 @@ public class LevelSetup : MonoBehaviour
     public float Tolerance = 0.02f;
     public List<float> UnitsScale = new List<float>();
     public float CirclePiece { get; private set; }
-    public float CurrentRadius { get; private set; }
-    public bool GameOn { get; private set; }
+    public static bool GameOn { get; private set; }
     public int CurrentStep { get; private set; }
     public List<Vector2> BullyPositions { get; private set; }
 
@@ -46,8 +45,6 @@ public class LevelSetup : MonoBehaviour
         _radius = (dimensions.x < dimensions.y) ? dimensions.x*_radiusScreenFactor : dimensions.y*_radiusScreenFactor;
 
         _lengthOfStep = _radius/TotalSteps;
-
-        CurrentRadius = _radius;
 
         _radiansEachUnit = (2*Mathf.PI)/UnitsScale.Count;
 
@@ -80,7 +77,7 @@ public class LevelSetup : MonoBehaviour
             {
                 CurrentStep++;
                 _nextStep += TimeBetweenSteps;
-                CurrentRadius -= _lengthOfStep;
+                _radius -= _lengthOfStep;
 
                 OnRadiusChanged();
                 UpdateCirclePiece();
@@ -102,14 +99,14 @@ public class LevelSetup : MonoBehaviour
     {
         var radians = _radiansEachUnit*index;
 
-        var x = Mathf.Cos(radians)*CurrentRadius;
-        var y = Mathf.Sin(radians)*CurrentRadius;
+        var x = Mathf.Cos(radians)*_radius;
+        var y = Mathf.Sin(radians)*_radius;
 
         return new Vector3(x, y, 0);
     }
 
     private void UpdateCirclePiece()
     {
-        CirclePiece = ((CurrentRadius*2)*Mathf.PI)/(360/(Mathf.Rad2Deg*_radiansEachUnit));
+        CirclePiece = ((_radius*2)*Mathf.PI)/(360/(Mathf.Rad2Deg*_radiansEachUnit));
     }
 }

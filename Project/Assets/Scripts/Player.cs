@@ -9,61 +9,70 @@ public class Player : MonoBehaviour
     private GameObject _lastBullyHit;
     private bool _playerControl = true;
     public float PlayerSpeed;
-    public LevelSetup Refe;
+    public LevelSetup LvlRef;
 
 
     public bool HitBully(Vector2 bullyPosition, bool sameBully)
     {
-        if (_playerControl || !sameBully)
+        if (LevelSetup.GameOn)
         {
-            _playerControl = false;
+            if (_playerControl || !sameBully)
+            {
+                _playerControl = false;
 
-            _direction = Vector3.zero - transform.position;
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
-            GetComponent<Rigidbody>().velocity = (_direction*FallSpeed);
+                _direction = Vector3.zero - transform.position;
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().velocity = (_direction*FallSpeed);
 
-            return true;
+                return true;
+            }
         }
 
         return false;
     }
 
     
-    // Update is called once per frame
     private void Update()
     {
-        if (_playerControl)
+        if (LevelSetup.GameOn)
         {
-            var x = Input.GetAxis("Horizontal");
-            var y = Input.GetAxis("Vertical");
-            var offset = (new Vector3(x, y, 0) * PlayerSpeed / ((Refe.CurrentStep + HurtDivisor) / HurtDivisor) * Time.deltaTime);
-
-            transform.position += offset;
-        }
-        else
-        {
-            if (!(GetComponent<Rigidbody>().velocity.magnitude < 0.5f))
+            if (_playerControl)
             {
-                return;
-            }
+                var x = Input.GetAxis("Horizontal");
+                var y = Input.GetAxis("Vertical");
+                var offset = (new Vector3(x, y, 0)*PlayerSpeed/((LvlRef.CurrentStep + HurtDivisor)/HurtDivisor)*
+                              Time.deltaTime);
 
-            _playerControl = true;
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
+                transform.position += offset;
+            }
+            else
+            {
+                if (!(GetComponent<Rigidbody>().velocity.magnitude < 0.5f))
+                {
+                    return;
+                }
+
+                _playerControl = true;
+                GetComponent<Rigidbody>().velocity = Vector3.zero;
+            }
         }
     }
     
 
     private void OnTriggerStay(Collider bully)
     {
-        if (HitBully(new Vector2(bully.transform.position.x, bully.transform.position.y),
-            bully.gameObject == _lastBullyHit))
+        if (LevelSetup.GameOn)
         {
-            _lastBullyHit = bully.gameObject;
-        }
+            if (HitBully(new Vector2(bully.transform.position.x, bully.transform.position.y),
+                bully.gameObject == _lastBullyHit))
+            {
+                _lastBullyHit = bully.gameObject;
+            }
 
-        if (Refe.CurrentStep >= Refe.TotalSteps)
-        {
-            Refe.EndGame();
+            if (LvlRef.CurrentStep >= LvlRef.TotalSteps)
+            {
+                LvlRef.EndGame();
+            }
         }
     }
 }
