@@ -11,7 +11,6 @@ public class Player : MonoBehaviour
     public float PlayerSpeed;
     public LevelSetup LvlRef;
 
-
     public bool HitBully(Vector2 bullyPosition, bool sameBully)
     {
         if (LevelSetup.GameOn)
@@ -31,7 +30,6 @@ public class Player : MonoBehaviour
         return false;
     }
 
-    
     private void Update()
     {
         if (LevelSetup.GameOn)
@@ -58,7 +56,6 @@ public class Player : MonoBehaviour
         }
     }
     
-
     private void OnTriggerStay(Collider bully)
     {
         if (LevelSetup.GameOn)

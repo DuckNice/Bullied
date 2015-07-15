@@ -5,14 +5,11 @@ public class Bully : MonoBehaviour
     public static LevelSetup SceneManager;
     public int CircleNumber;
 
-	// Use this for initialization
-	void Start () {
-	    SceneManager.OnRadiusChanged += CalculateNewPosition;
-	}
-
     public void Init()
     {
+        SceneManager.OnRadiusChanged += CalculateNewPosition;
         transform.position = SceneManager.UnitCirclePosition(CircleNumber);
+        transform.Rotate(new Vector3(0, 0, (Mathf.Rad2Deg * SceneManager.CalculateRadians(CircleNumber))));
     }
 
     void CalculateNewPosition()

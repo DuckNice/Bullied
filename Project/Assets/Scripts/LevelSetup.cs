@@ -6,7 +6,6 @@ public class LevelSetup : MonoBehaviour
     public delegate void RadiusChangeHandler();
 
     [SerializeField] private float _radiusScreenFactor = 1;
-
     private float _lengthOfStep;
     private float _nextStep;
     private float _radiansEachUnit;
@@ -15,10 +14,10 @@ public class LevelSetup : MonoBehaviour
     public float AttackTolerance;
     public GameObject BullyPrefab;
     public GameObject Player;
-    public int TotalSteps = 4;
     public float StepSpeed;
     public float TimeBetweenSteps;
     public float Tolerance = 0.02f;
+    public int TotalSteps = 4;
     public List<float> UnitsScale = new List<float>();
     public float CirclePiece { get; private set; }
     public static bool GameOn { get; private set; }
@@ -52,19 +51,18 @@ public class LevelSetup : MonoBehaviour
 
         Bully.SceneManager = this;
 
-        float radians = 0;
         for (var i = 0; i < UnitsScale.Count; i++)
         {
             var unit = Instantiate(BullyPrefab);
             var bullyScript = unit.GetComponent<Bully>();
             bullyScript.CircleNumber = i;
             bullyScript.Init();
-
-            //TODO: Funktion til at udregne bully's rotation. Flyt til bully script.
-            unit.transform.Rotate(new Vector3(0, 0, (Mathf.Rad2Deg*radians)));
-
-            radians += _radiansEachUnit;
         }
+    }
+
+    public float CalculateRadians(int i)
+    {
+        return _radiansEachUnit * i;
     }
 
     public event RadiusChangeHandler OnRadiusChanged;
