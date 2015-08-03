@@ -11,7 +11,9 @@ public enum MusicTrack
 
 public class SoundManager : MonoBehaviour
 {
-    [SerializeField]
+    public delegate void TrackChangeHandler();
+    public static event TrackChangeHandler OnTrackChanged;
+
     public AudioSource IntroSource;
     public AudioSource BuildupSource;
     public AudioSource ClimaxSource;
@@ -20,8 +22,8 @@ public class SoundManager : MonoBehaviour
 
     private void OnEnable()
     {
-        SetMusicTrack(0);
-        LevelSetup.OnRadiusChanged += SetMusicTrack;
+        LevelSetup.OnStep += SetMusicTrack;
+        OnTrackChanged += () => { };
     }
 
 
@@ -69,6 +71,8 @@ public class SoundManager : MonoBehaviour
 
                 playingSource.Play();
                 playingSource.loop = true;
+
+                OnTrackChanged();
 
                 break;
             }

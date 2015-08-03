@@ -4,6 +4,10 @@ using UnityEngine;
 public class LevelSetup : MonoBehaviour
 {
     public delegate void RadiusChangeHandler(int CurrentStep);
+    public static event RadiusChangeHandler OnRadiusChanged;
+
+    public delegate void StepHandler(int CurrentStep);
+    public static event StepHandler OnStep;
 
     [SerializeField] private float _radiusScreenFactor = 1;
     private float _lengthOfStep;
@@ -17,7 +21,10 @@ public class LevelSetup : MonoBehaviour
     public float StepSpeed;
     public float TimeBetweenSteps;
     public float Tolerance = 0.02f;
+    private bool stepable = true;
     public int TotalSteps = 4;
+    [SerializeField]
+    private float _innerRadiusScreenFactor = 0.3f;
     public List<float> UnitsScale = new List<float>();
     public float CirclePiece { get; private set; }
     public static bool GameOn { get; private set; }
@@ -40,10 +47,13 @@ public class LevelSetup : MonoBehaviour
     {
         GameOn = true;
 
+        SoundManager.OnTrackChanged += Step;
+
         var dimensions = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
         _radius = (dimensions.x < dimensions.y) ? dimensions.x*_radiusScreenFactor : dimensions.y*_radiusScreenFactor;
+        var _innerRadius = (dimensions.x < dimensions.y) ? dimensions.x * _innerRadiusScreenFactor : dimensions.y * _innerRadiusScreenFactor;
 
-        _lengthOfStep = _radius/TotalSteps;
+        _lengthOfStep = (_radius - _innerRadius)/TotalSteps;
 
         _radiansEachUnit = (2*Mathf.PI)/UnitsScale.Count;
 
@@ -65,20 +75,16 @@ public class LevelSetup : MonoBehaviour
         return _radiansEachUnit * i;
     }
 
-    public static event RadiusChangeHandler OnRadiusChanged;
-
     private void Update()
     {
         if (GameOn)
         {
-            if (Time.time > _nextStep)
+            if (stepable && Time.time > _nextStep)
             {
                 CurrentStep++;
-                _nextStep += TimeBetweenSteps;
-                _radius -= _lengthOfStep;
+                OnStep(CurrentStep);
+                stepable = false;
 
-                OnRadiusChanged(CurrentStep);
-                UpdateCirclePiece();
             }
         }
     }
@@ -86,6 +92,16 @@ public class LevelSetup : MonoBehaviour
     public void EndGame()
     {
         GameOn = false;
+    }
+
+    public void Step()
+    {
+        _nextStep += TimeBetweenSteps;
+        _radius -= _lengthOfStep;
+
+        OnRadiusChanged(CurrentStep);
+        UpdateCirclePiece();
+        stepable = true;
     }
 
     public Vector3 UnitCirclePosition(int index)
