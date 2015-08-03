@@ -20,17 +20,17 @@ public class SoundManager : MonoBehaviour
 
     private void OnEnable()
     {
-        StartCoroutine(SwitchSound(MusicTrack.Buildup));
+        SetMusicTrack(0);
         LevelSetup.OnRadiusChanged += SetMusicTrack;
     }
 
 
 
-    void SetMusicTrack(int CurrentStep)
+    void SetMusicTrack(int currentStep)
     {
         MusicTrack newTrack = MusicTrack.Buildup;
 
-        
+        newTrack = tracks[currentStep];
 
         StartCoroutine(SwitchSound(newTrack));
     }

@@ -86,11 +86,6 @@ public class LevelSetup : MonoBehaviour
     public void EndGame()
     {
         GameOn = false;
-
-/*#if UNITY_EDITOR
-        EditorApplication.isPlaying = false;
-#endif
-        Application.Quit();*/
     }
 
     public Vector3 UnitCirclePosition(int index)
