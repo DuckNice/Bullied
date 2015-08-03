@@ -16,22 +16,22 @@ public class SoundManager : MonoBehaviour
     public AudioSource BuildupSource;
     public AudioSource ClimaxSource;
     public AudioSource EncoreSource;
-
+    public MusicTrack[] tracks;
 
     private void OnEnable()
     {
-        Invoke("setTrack", 20);
+        StartCoroutine(SwitchSound(MusicTrack.Buildup));
+        LevelSetup.OnRadiusChanged += SetMusicTrack;
     }
 
 
-    void SetTrack()
-    {
-        SetMusicTrack(MusicTrack.Buildup);
-    }
 
-
-    public void SetMusicTrack(MusicTrack newTrack)
+    void SetMusicTrack(int CurrentStep)
     {
+        MusicTrack newTrack = MusicTrack.Buildup;
+
+        
+
         StartCoroutine(SwitchSound(newTrack));
     }
 

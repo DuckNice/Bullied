@@ -7,14 +7,30 @@ public class Bully : MonoBehaviour
 
     public void Init()
     {
-        SceneManager.OnRadiusChanged += CalculateNewPosition;
+        LevelSetup.OnRadiusChanged += CalculateNewPosition;
         transform.position = SceneManager.UnitCirclePosition(CircleNumber);
-        transform.Rotate(new Vector3(0, 0, (Mathf.Rad2Deg * SceneManager.CalculateRadians(CircleNumber))));
+        CalculateNewRotation();
     }
 
-    void CalculateNewPosition()
+    void CalculateNewPosition(int CurrentStep)
     {
         SceneManager.UnitCirclePosition(CircleNumber);
+    }
+
+    void CalculateNewRotation()
+    {
+        gameObject.transform.rotation = Quaternion.identity;
+
+        Vector2 u = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
+        u.Normalize();
+        Vector2 v = Vector2.right;
+
+        float dot = (v.x * u.x) + (v.y * u.y);
+        float det = (v.x * u.y) - (v.y * u.x);
+
+        float angle = Mathf.Atan2(det, dot);
+
+        gameObject.transform.Rotate(Vector3.forward, Mathf.Rad2Deg * angle);
     }
 
 	void Update ()
@@ -44,6 +60,8 @@ public class Bully : MonoBehaviour
 	                                      SceneManager.AttackSpeed*Time.deltaTime;
 	            }
 	        }
+
+            CalculateNewRotation();
 	    }
     }
 }

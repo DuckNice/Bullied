@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class LevelSetup : MonoBehaviour
 {
-    public delegate void RadiusChangeHandler();
+    public delegate void RadiusChangeHandler(int CurrentStep);
 
     [SerializeField] private float _radiusScreenFactor = 1;
     private float _lengthOfStep;
@@ -65,7 +65,7 @@ public class LevelSetup : MonoBehaviour
         return _radiansEachUnit * i;
     }
 
-    public event RadiusChangeHandler OnRadiusChanged;
+    public static event RadiusChangeHandler OnRadiusChanged;
 
     private void Update()
     {
@@ -77,7 +77,7 @@ public class LevelSetup : MonoBehaviour
                 _nextStep += TimeBetweenSteps;
                 _radius -= _lengthOfStep;
 
-                OnRadiusChanged();
+                OnRadiusChanged(CurrentStep);
                 UpdateCirclePiece();
             }
         }
