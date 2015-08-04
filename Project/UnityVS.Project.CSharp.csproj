@@ -67,6 +67,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Bully.cs" />
     <Compile Include="Assets\Scripts\LevelSetup.cs" />
+    <Compile Include="Assets\Scripts\ParticlePacer.cs" />
     <Compile Include="Assets\Scripts\Player.cs" />
     <Compile Include="Assets\Scripts\SoundManager.cs" />
   </ItemGroup>

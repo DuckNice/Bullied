@@ -30,6 +30,9 @@ public class Player : MonoBehaviour
         return false;
     }
 
+    public float shakeSpeed = 1.0f; //how fast it shakes
+    public float shakeAmount = 1.0f; //how much it shakes
+
     private void Update()
     {
         if (LevelSetup.GameOn)
@@ -42,6 +45,8 @@ public class Player : MonoBehaviour
                               Time.deltaTime);
 
                 transform.position += offset;
+
+                transform.position += new Vector3(Mathf.Sin(Time.time * shakeSpeed) * shakeAmount, 0, 0);
             }
             else
             {
