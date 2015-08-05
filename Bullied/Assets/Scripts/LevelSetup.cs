@@ -8,6 +8,7 @@ public class LevelSetup : MonoBehaviour
 
     public delegate void StepHandler(int CurrentStep);
     public static event StepHandler OnStep;
+    [SerializeField] private bool _doStep = false;
 
     [SerializeField] private float _radiusScreenFactor = 1;
     private float _lengthOfStep;
@@ -23,8 +24,7 @@ public class LevelSetup : MonoBehaviour
     public float Tolerance = 0.02f;
     private bool stepable = true;
     public int TotalSteps = 4;
-    [SerializeField]
-    private float _innerRadiusScreenFactor = 0.3f;
+    [SerializeField] private float _innerRadiusScreenFactor = 0.3f;
     public List<float> UnitsScale = new List<float>();
     public float CirclePiece { get; private set; }
     public static bool GameOn { get; private set; }
@@ -79,12 +79,12 @@ public class LevelSetup : MonoBehaviour
     {
         if (GameOn)
         {
-            if (stepable && Time.time > _nextStep)
+            if ((stepable && Time.time > _nextStep) || _doStep)
             {
                 CurrentStep++;
                 OnStep(CurrentStep);
                 stepable = false;
-
+                _doStep = false;
             }
         }
     }

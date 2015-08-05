@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class Player : MonoBehaviour
 {
@@ -30,9 +31,21 @@ public class Player : MonoBehaviour
         return false;
     }
 
-    public float shakeSpeed = 1.0f; //how fast it shakes
-    public float shakeAmount = 1.0f; //how much it shakes
+    #region player movement disability
+    [SerializeField] private Vector3 _shakeStartHitsAmount;
+    [SerializeField] private Vector3 _slowStartHitsAmount;
+    [SerializeField] private float _shakeInterval;
+    [SerializeField] private int _shakeStartStep;
+    [SerializeField] private int _slowStartStep;
+    private int _slowHitCounter = 0;
+    private int _shakeHitCounter = 0;
+    private float _lastShake;
+    [SerializeField] private float _shakeLength;
+    private bool _shakeInProgress = false;
+    [SerializeField] private float _shakeSpeed;
 
+    #endregion
+    
     private void Update()
     {
         if (LevelSetup.GameOn)
@@ -41,12 +54,24 @@ public class Player : MonoBehaviour
             {
                 var x = Input.GetAxis("Horizontal");
                 var y = Input.GetAxis("Vertical");
-                var offset = (new Vector3(x, y, 0)*PlayerSpeed/((LvlRef.CurrentStep + HurtDivisor)/HurtDivisor)*
-                              Time.deltaTime);
+                float drag = 0;
+
+                if(LvlRef.CurrentStep >= _slowStartStep && _slowStartHitsAmount.x < _slowHitCounter)
+                {
+                    float relHit = Mathf.Clamp01((_slowHitCounter - _slowStartHitsAmount.x) / _slowStartHitsAmount.y);
+                    drag = relHit * _slowStartHitsAmount.z;
+                }
+
+                Vector3 offset = new Vector3(x, y, 0) * (PlayerSpeed - drag) * Time.deltaTime;
 
                 transform.position += offset;
 
-                transform.position += new Vector3(Mathf.Sin(Time.time * shakeSpeed) * shakeAmount, 0, 0);
+                if(!_shakeInProgress && LvlRef.CurrentStep >= _shakeStartHitsAmount.x && 
+                    _lastShake + _shakeInterval <= Time.time)
+                {
+                    StartCoroutine("Shake");
+                }
+
             }
             else
             {
@@ -60,6 +85,29 @@ public class Player : MonoBehaviour
             }
         }
     }
+
+    private IEnumerator Shake()
+    {
+        _shakeInProgress = true;
+        _lastShake = Time.time;
+
+        while(true)
+        {
+            float relAmount = Mathf.Clamp01((_shakeHitCounter - _shakeStartHitsAmount.x) / _shakeStartHitsAmount.y);
+            float shakeAmount = relAmount * _shakeStartHitsAmount.z;
+
+            transform.position += new Vector3(Mathf.Sin(Time.time * _shakeSpeed) * shakeAmount, 0, 0);
+            
+            if(_lastShake + _shakeLength < Time.time){
+                break;
+            }
+
+            yield return new WaitForFixedUpdate();
+        }
+
+        _lastShake = Time.time;
+        _shakeInProgress = false;
+    }
     
     private void OnTriggerStay(Collider bully)
     {
@@ -69,6 +117,14 @@ public class Player : MonoBehaviour
                 bully.gameObject == _lastBullyHit))
             {
                 _lastBullyHit = bully.gameObject;
+                if (LvlRef.CurrentStep >= _slowStartStep)
+                {
+                    _slowHitCounter++;
+                }
+                if (LvlRef.CurrentStep >= _shakeStartStep)
+                {
+                    _shakeHitCounter++;
+                }
             }
 
             if (LvlRef.CurrentStep >= LvlRef.TotalSteps)
