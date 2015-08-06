@@ -66,12 +66,11 @@ public class Player : MonoBehaviour
 
                 transform.position += offset;
 
-                if(!_shakeInProgress && LvlRef.CurrentStep >= _shakeStartHitsAmount.x && 
+                if(!_shakeInProgress && LvlRef.CurrentStep >= _shakeStartStep && _shakeHitCounter >= _shakeStartHitsAmount.x && 
                     _lastShake + _shakeInterval <= Time.time)
                 {
                     StartCoroutine("Shake");
                 }
-
             }
             else
             {

@@ -1,20 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class ParticlePacer : MonoBehaviour {
     public ParticleSystem emitter;
-
-    [SerializeField] private Color _startColorL;
-    [SerializeField] private Color _startColorD;
-    [SerializeField] private Color _endColorL;
-    [SerializeField] private Color _endColorD;
-    [SerializeField] private AnimationCurve _colorProgress;
 
     [SerializeField] private AnimationCurve _emitanceProgress;
 
     public LevelSetup GameManager;
 
     private float _duration;
+
+    List<Particle> particles = new List<Particle>();
 
     protected void Start()
     {
@@ -23,6 +20,12 @@ public class ParticlePacer : MonoBehaviour {
 
     protected void Update()
     {
-        emitter.emissionRate = _emitanceProgress.Evaluate(Time.time / _duration);
+     /*   for(int i = particles.Count - 1; i >= 0 ; i++)
+        {
+            if(particles[i].)
+            {
+                particles.RemoveAt(i);
+            }
+        }*/
     }
 }

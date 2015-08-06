@@ -8,6 +8,10 @@ public class LevelSetup : MonoBehaviour
 
     public delegate void StepHandler(int CurrentStep);
     public static event StepHandler OnStep;
+
+    public delegate void GameEndedHandler();
+    public static event GameEndedHandler OnGameEnded;
+
     [SerializeField] private bool _doStep = false;
 
     [SerializeField] private float _radiusScreenFactor = 1;
@@ -79,7 +83,7 @@ public class LevelSetup : MonoBehaviour
     {
         if (GameOn)
         {
-            if ((stepable && Time.time > _nextStep) || _doStep)
+            if (((stepable && Time.time > _nextStep) || _doStep) && CurrentStep < TotalSteps)
             {
                 CurrentStep++;
                 OnStep(CurrentStep);
@@ -92,6 +96,7 @@ public class LevelSetup : MonoBehaviour
     public void EndGame()
     {
         GameOn = false;
+        OnGameEnded();
     }
 
     public void Step()

@@ -32,7 +32,7 @@ public class SoundManager : MonoBehaviour
     {
         MusicTrack newTrack = MusicTrack.Buildup;
 
-        newTrack = tracks[currentStep];
+        newTrack = tracks[Mathf.Clamp(currentStep, 0, tracks.Length - 1)];
 
         StartCoroutine(SwitchSound(newTrack));
     }
