@@ -51,7 +51,7 @@ public class SoundManager : MonoBehaviour
 
         while (true)
         {
-            if (!playingSource.isPlaying)
+            if (!playingSource.isPlaying && LevelSetup.GameOn)
             {
                 switch (newTrack)
                 {
