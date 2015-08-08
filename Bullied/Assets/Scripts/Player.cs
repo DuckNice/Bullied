@@ -74,16 +74,31 @@ public class Player : MonoBehaviour
             }
             else
             {
-                if (!(GetComponent<Rigidbody>().velocity.magnitude < 0.5f))
+                if (!(GetComponent<Rigidbody>().velocity.magnitude < 0.02f) && _waitStart < 0.0f)
                 {
-                    return;
+                    _waitStart = Time.time;
                 }
-
-                _playerControl = true;
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                else if (_timeToWait + _waitStart < Time.time)
+                {
+                    _playerControl = true;
+                    GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    _waitStart = -1;
+                }
             }
         }
+
+        if(!_hitBullyOnUpdate)
+        {
+            _isHittingBully = false;
+        }
+        _hitBullyOnUpdate = false;
     }
+
+    bool _hitBullyOnUpdate = false;
+    bool _isHittingBully = false;
+
+    private float _waitStart = -1;
+    [SerializeField] private float _timeToWait = 2;
 
     private IEnumerator Shake()
     {
@@ -112,18 +127,22 @@ public class Player : MonoBehaviour
     {
         if (LevelSetup.GameOn)
         {
+
             if (HitBully(new Vector2(bully.transform.position.x, bully.transform.position.y),
                 bully.gameObject == _lastBullyHit))
             {
                 _lastBullyHit = bully.gameObject;
-                if (LvlRef.CurrentStep >= _slowStartStep)
+                if (LvlRef.CurrentStep >= _slowStartStep && !_isHittingBully)
                 {
                     _slowHitCounter++;
                 }
-                if (LvlRef.CurrentStep >= _shakeStartStep)
+                if (LvlRef.CurrentStep >= _shakeStartStep && !_isHittingBully)
                 {
                     _shakeHitCounter++;
                 }
+
+                _hitBullyOnUpdate = true;
+                _isHittingBully = true;
             }
 
             if (LvlRef.CurrentStep >= LvlRef.TotalSteps)

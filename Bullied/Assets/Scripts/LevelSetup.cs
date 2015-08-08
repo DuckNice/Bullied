@@ -5,6 +5,7 @@ public class LevelSetup : MonoBehaviour
 {
     public delegate void RadiusChangeHandler(int CurrentStep);
     public static event RadiusChangeHandler OnRadiusChanged;
+    public SoundManager soundManager;
 
     public delegate void StepHandler(int CurrentStep);
     public static event StepHandler OnStep;
@@ -97,6 +98,7 @@ public class LevelSetup : MonoBehaviour
     {
         GameOn = false;
         OnGameEnded();
+        soundManager.StopMusic();
     }
 
     public void Step()

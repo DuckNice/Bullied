@@ -22,13 +22,19 @@ public class SoundManager : MonoBehaviour
 
     private void OnEnable()
     {
-        LevelSetup.OnStep += SetMusicTrack;
+        LevelSetup.OnStep += SetInGameMusicTrack;
         OnTrackChanged += () => { };
     }
 
+    public void StopMusic()
+    {
+        IntroSource.Stop();
+        BuildupSource.Stop();
+        ClimaxSource.Stop();
+        EncoreSource.Stop();
+    }
 
-
-    void SetMusicTrack(int currentStep)
+    void SetInGameMusicTrack(int currentStep)
     {
         MusicTrack newTrack = MusicTrack.Buildup;
 
@@ -43,6 +49,7 @@ public class SoundManager : MonoBehaviour
         IntroSource.loop = false;
         BuildupSource.loop = false;
         ClimaxSource.loop = false;
+        EncoreSource.loop = false;
 
         var playingSource = (IntroSource.isPlaying)
             ? IntroSource : (BuildupSource.isPlaying) 
