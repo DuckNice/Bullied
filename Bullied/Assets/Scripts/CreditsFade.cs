@@ -25,8 +25,11 @@ public class CreditsFade : MonoBehaviour {
     private float sessionStart;
     [SerializeField] private float creditsMusicEndDelayBeforeTurnDown;
     private int curStep = 0;
+    [SerializeField]
+    private float trackDuration;
 
     private int step = 0;
+    private bool changing = false;
     
 
 	// Update is called once per frame
@@ -55,11 +58,13 @@ public class CreditsFade : MonoBehaviour {
                         sessionStart = Time.time;
                         _credits.enabled = true;
                         soundManager.SetCreditsMusicTrack(curStep);
+                        SoundManager.OnTrackChanged += () => { changing = true; sessionStart = Time.time;};
                     }
                     break;
                 case 2:
-                    if (curStep < soundManager.tracksCredits.Length)
+                    if (curStep < soundManager.tracksCredits.Length && sessionStart + trackDuration < Time.time && !changing)
                     {
+                        changing  = true;
                         soundManager.SetCreditsMusicTrack(++curStep);
                     }
                     else
