@@ -18,7 +18,8 @@ public class SoundManager : MonoBehaviour
     public AudioSource BuildupSource;
     public AudioSource ClimaxSource;
     public AudioSource EncoreSource;
-    public MusicTrack[] tracks;
+    public MusicTrack[] tracksInGame;
+    public MusicTrack[] tracksCredits;
 
     private void OnEnable()
     {
@@ -38,11 +39,19 @@ public class SoundManager : MonoBehaviour
     {
         MusicTrack newTrack = MusicTrack.Buildup;
 
-        newTrack = tracks[Mathf.Clamp(currentStep, 0, tracks.Length - 1)];
+        newTrack = tracksInGame[Mathf.Clamp(currentStep, 0, tracksInGame.Length - 1)];
 
         StartCoroutine(SwitchSound(newTrack));
     }
 
+    public void SetCreditsMusicTrack(int currentStep)
+    {
+        MusicTrack newTrack = MusicTrack.Buildup;
+
+        newTrack = tracksCredits[Mathf.Clamp(currentStep, 0, tracksCredits.Length - 1)];
+
+        StartCoroutine(SwitchSound(newTrack));
+    }
 
     IEnumerator SwitchSound(MusicTrack newTrack)
     {
