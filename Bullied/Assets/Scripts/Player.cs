@@ -10,7 +10,20 @@ public class Player : MonoBehaviour
     private GameObject _lastBullyHit;
     private bool _playerControl = true;
     public float PlayerSpeed;
-    public LevelSetup LvlRef;
+
+    #region player movement disability
+        [SerializeField] private Vector3 _shakeStartHitsAmount;
+        [SerializeField] private Vector3 _slowStartHitsAmount;
+        [SerializeField] private float _shakeInterval;
+        [SerializeField] private int _shakeStartStep;
+        [SerializeField] private int _slowStartStep;
+        private int _slowHitCounter = 0;
+        private int _shakeHitCounter = 0;
+        private float _lastShake;
+        [SerializeField] private float _shakeLength;
+        private bool _shakeInProgress = false;
+        [SerializeField] private float _shakeSpeed;
+    #endregion
 
     public bool HitBully(Vector2 bullyPosition, bool sameBully)
     {
@@ -22,7 +35,7 @@ public class Player : MonoBehaviour
 
                 _direction = Vector3.zero - transform.position;
                 GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().velocity = (_direction*FallSpeed);
+                GetComponent<Rigidbody>().velocity = (_direction * FallSpeed);
 
                 return true;
             }
@@ -31,21 +44,6 @@ public class Player : MonoBehaviour
         return false;
     }
 
-    #region player movement disability
-    [SerializeField] private Vector3 _shakeStartHitsAmount;
-    [SerializeField] private Vector3 _slowStartHitsAmount;
-    [SerializeField] private float _shakeInterval;
-    [SerializeField] private int _shakeStartStep;
-    [SerializeField] private int _slowStartStep;
-    private int _slowHitCounter = 0;
-    private int _shakeHitCounter = 0;
-    private float _lastShake;
-    [SerializeField] private float _shakeLength;
-    private bool _shakeInProgress = false;
-    [SerializeField] private float _shakeSpeed;
-
-    #endregion
-    
     private void Update()
     {
         if (LevelSetup.GameOn)
@@ -56,7 +54,7 @@ public class Player : MonoBehaviour
                 var y = Input.GetAxis("Vertical");
                 float drag = 0;
 
-                if(LvlRef.CurrentStep >= _slowStartStep && _slowStartHitsAmount.x < _slowHitCounter)
+                if (LevelSetup.instance.CurrentStep >= _slowStartStep && _slowStartHitsAmount.x < _slowHitCounter)
                 {
                     float relHit = Mathf.Clamp01((_slowHitCounter - _slowStartHitsAmount.x) / _slowStartHitsAmount.y);
                     drag = relHit * _slowStartHitsAmount.z;
@@ -66,7 +64,7 @@ public class Player : MonoBehaviour
 
                 transform.position += offset;
 
-                if(!_shakeInProgress && LvlRef.CurrentStep >= _shakeStartStep && _shakeHitCounter >= _shakeStartHitsAmount.x && 
+                if (!_shakeInProgress && LevelSetup.instance.CurrentStep >= _shakeStartStep && _shakeHitCounter >= _shakeStartHitsAmount.x && 
                     _lastShake + _shakeInterval <= Time.time)
                 {
                     StartCoroutine("Shake");
@@ -132,11 +130,11 @@ public class Player : MonoBehaviour
                 bully.gameObject == _lastBullyHit))
             {
                 _lastBullyHit = bully.gameObject;
-                if (LvlRef.CurrentStep >= _slowStartStep && !_isHittingBully)
+                if (LevelSetup.instance.CurrentStep >= _slowStartStep && !_isHittingBully)
                 {
                     _slowHitCounter++;
                 }
-                if (LvlRef.CurrentStep >= _shakeStartStep && !_isHittingBully)
+                if (LevelSetup.instance.CurrentStep >= _shakeStartStep && !_isHittingBully)
                 {
                     _shakeHitCounter++;
                 }
@@ -145,9 +143,9 @@ public class Player : MonoBehaviour
                 _isHittingBully = true;
             }
 
-            if (LvlRef.CurrentStep >= LvlRef.TotalSteps)
+            if (LevelSetup.instance.CurrentStep >= LevelSetup.instance.TotalSteps)
             {
-                LvlRef.EndGame();
+                LevelSetup.instance.EndGame();
             }
         }
     }

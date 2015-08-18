@@ -8,7 +8,6 @@ public class CreditsFade : MonoBehaviour {
 	void Start () {
         LevelSetup.OnGameEnded += new LevelSetup.GameEndedHandler(delegate() { _fadeStart = Time.time; });
         _mat.SetColor("_TintColor", new Color(0, 0, 0, 0));
-        _credits.rectTransform.anchoredPosition.Set(_credits.rectTransform.anchoredPosition.x, _creditsStartEndY.x);
         _credits.enabled = false;
 	}
 
@@ -18,69 +17,77 @@ public class CreditsFade : MonoBehaviour {
     [SerializeField] private Material _mat;
     private float _bgTint = 0;
     [SerializeField] private Text _credits;
-    [SerializeField] private Vector2 _creditsStartEndY;
-    [SerializeField] private float _speed = 2.0f;
-    [SerializeField] private SoundManager soundManager;
-    [SerializeField] private float creditsFadeShowDelay;
+    [SerializeField] private float _creditsFadeShowDelay;
     private float sessionStart;
-    [SerializeField] private float creditsMusicEndDelayBeforeTurnDown;
-    private int curStep = 0;
+    [SerializeField] private float _creditsMusicEndDelayBeforeTurnDown;
+    private int _curStep = 0;
     [SerializeField]
-    private float trackDuration;
+    private float _trackDuration;
 
-    private int step = 0;
-    private bool changing = false;
-    
+    private int _step = 0;
+    private bool _changing = false;
+ 
 
 	// Update is called once per frame
 	void Update () {
 	    if(!LevelSetup.GameOn)
         {
-            switch(step)
+            switch(_step)
             {
                 case 0:
-                    if (_bgTint < 1)
+                    if (_bgTint < 0.5f)
                     {
-                        _bgTint = 1 * Mathf.Clamp01((Time.time - (_fadeStart + _fadeDelay)) / _fadeDuration);
+                        _bgTint = 0.5f * Mathf.Clamp01((Time.time - (_fadeStart + _fadeDelay)) / _fadeDuration);
                         _mat.SetColor("_TintColor", new Color(0, 0, 0, _bgTint));
-                        sessionStart = Time.time;
                     }
                     else
                     {
-                        step++;
+                        sessionStart = Time.time;
+                        _step++;
                     }
                     break;
 
                 case 1:
-                    if (sessionStart + creditsFadeShowDelay < Time.time)
+                    if (sessionStart + _creditsFadeShowDelay < Time.time)
                     {
-                        step++;
+                        _step++;
                         sessionStart = Time.time;
                         _credits.enabled = true;
-                        soundManager.SetCreditsMusicTrack(curStep);
-                        SoundManager.OnTrackChanged += () => { changing = true; sessionStart = Time.time;};
+                        SoundManager.instance.SetCreditsMusicTrack(_curStep);
+                        SoundManager.OnTrackChanged += () => { _changing = false; sessionStart = Time.time;};
                     }
                     break;
                 case 2:
-                    if (curStep < soundManager.tracksCredits.Length && sessionStart + trackDuration < Time.time && !changing)
+                    if (_curStep < SoundManager.instance.tracksCredits.Length && sessionStart + _trackDuration > Time.time && !_changing)
                     {
-                        changing  = true;
-                        soundManager.SetCreditsMusicTrack(++curStep);
+                        _changing  = true;
+                        SoundManager.instance.SetCreditsMusicTrack(++_curStep);
                     }
-                    else
+                    else if (SoundManager.instance.tracksCredits.Length <= _curStep)
                     {
-                        step++;
+                        _step++;
                         sessionStart = Time.time;
+                        _changing = false;
+
                     }
                     break;
                 case 3:
-                    if (sessionStart + creditsMusicEndDelayBeforeTurnDown < Time.time)
+                    if (sessionStart + _creditsMusicEndDelayBeforeTurnDown < Time.time && !_changing)
                     {
-                        Application.Quit();
+                        SoundManager.OnTrackChanged += () =>
+                        {
+                            Application.Quit();
+#if UNITY_EDITOR
+                            UnityEditor.EditorApplication.isPlaying = false;
+#endif
+                        };
+
+                        SoundManager.instance.SetCreditsMusicTrack(++_curStep);
+                        _changing = true;
+
                     }
                     break;
             }
-
         }
 	}
 }

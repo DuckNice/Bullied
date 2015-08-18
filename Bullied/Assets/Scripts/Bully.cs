@@ -2,19 +2,51 @@
 
 public class Bully : MonoBehaviour
 {
-    public static LevelSetup SceneManager;
     public int CircleNumber;
 
     public void Init()
     {
         LevelSetup.OnRadiusChanged += CalculateNewPosition;
-        transform.position = SceneManager.UnitCirclePosition(CircleNumber);
+        transform.position = LevelSetup.instance.UnitCirclePosition(CircleNumber);
         CalculateNewRotation();
     }
 
     void CalculateNewPosition(int CurrentStep)
     {
-        SceneManager.UnitCirclePosition(CircleNumber);
+        LevelSetup.instance.UnitCirclePosition(CircleNumber);
+    }
+
+    
+	void Update ()
+    {
+	    if (LevelSetup.GameOn)
+	    {
+	        if (
+                Vector3.Distance(LevelSetup.instance.UnitCirclePosition(CircleNumber),
+                    LevelSetup.instance.Player.transform.position)
+	            <
+                LevelSetup.instance.CirclePiece + LevelSetup.instance.AttackTolerance)
+	        {
+                var travel = (Vector3.Distance(LevelSetup.instance.UnitCirclePosition(CircleNumber), transform.position) +
+                              (LevelSetup.instance.AttackSpeed * Time.deltaTime)) /
+                             Vector3.Distance(LevelSetup.instance.UnitCirclePosition(CircleNumber),
+                                 LevelSetup.instance.Player.transform.position);
+
+                transform.position = Vector3.Lerp(LevelSetup.instance.UnitCirclePosition(CircleNumber),
+                    LevelSetup.instance.Player.transform.position, travel);
+	        }
+	        else
+	        {
+                if (Vector3.Distance(LevelSetup.instance.UnitCirclePosition(CircleNumber), transform.position) >
+                    LevelSetup.instance.Tolerance)
+	            {
+                    transform.position += (LevelSetup.instance.UnitCirclePosition(CircleNumber) - transform.position) *
+                                          LevelSetup.instance.StepSpeed * Time.deltaTime;
+	            }
+	        }
+
+            CalculateNewRotation();
+	    }
     }
 
     void CalculateNewRotation()
@@ -33,35 +65,4 @@ public class Bully : MonoBehaviour
         gameObject.transform.Rotate(Vector3.forward, Mathf.Rad2Deg * angle);
     }
 
-	void Update ()
-    {
-	    if (LevelSetup.GameOn)
-	    {
-	        if (
-	            Vector3.Distance(SceneManager.UnitCirclePosition(CircleNumber),
-	                SceneManager.Player.transform.position)
-	            <
-	            SceneManager.CirclePiece + SceneManager.AttackTolerance)
-	        {
-	            var travel = (Vector3.Distance(SceneManager.UnitCirclePosition(CircleNumber), transform.position) +
-	                          (SceneManager.AttackSpeed*Time.deltaTime))/
-	                         Vector3.Distance(SceneManager.UnitCirclePosition(CircleNumber),
-	                             SceneManager.Player.transform.position);
-
-	            transform.position = Vector3.Lerp(SceneManager.UnitCirclePosition(CircleNumber),
-	                SceneManager.Player.transform.position, travel);
-	        }
-	        else
-	        {
-	            if (Vector3.Distance(SceneManager.UnitCirclePosition(CircleNumber), transform.position) >
-	                SceneManager.Tolerance)
-	            {
-	                transform.position += (SceneManager.UnitCirclePosition(CircleNumber) - transform.position)*
-	                                      SceneManager.AttackSpeed*Time.deltaTime;
-	            }
-	        }
-
-            CalculateNewRotation();
-	    }
-    }
 }

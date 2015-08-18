@@ -12,9 +12,7 @@ public class ParticlePacer : MonoBehaviour {
     [SerializeField] private AnimationCurve _particleOverlap;
     [SerializeField] private int startStep = 2;
     private float timeStart = -1;
-
-    public LevelSetup GameManager;
-    
+  
     List<Particle> particles = new List<Particle>();
 
     protected void Start()
@@ -24,7 +22,7 @@ public class ParticlePacer : MonoBehaviour {
 
     protected void Update()
     {
-        if(startStep <= GameManager.CurrentStep)
+        if(startStep <= LevelSetup.instance.CurrentStep)
         {
             if(timeStart < 0)
             {

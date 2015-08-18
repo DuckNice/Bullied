@@ -188,7 +188,7 @@
         </sendList>
         <audioClip clipAutoCrossfade="true" crossFadeHeadClipID="-1" crossFadeTailClipID="-1" endPoint="385307" fileID="0" hue="-1" id="0" lockedInTime="false" looped="true" name="Tomasz Bednarczyk - I see you Official Video" offline="false" select="false" sourceInPoint="961560" sourceOutPoint="1337166" startPoint="9701" zOrder="137">
           <component componentID="Audition.Fader" id="clipGain" name="volume" powered="true">
-            <parameter index="0" name="volume" parameterValue="1">
+            <parameter index="0" name="volume" parameterValue="0">
               <parameterKeyframes enableSplines="false">
                 <parameterKeyframe sampleOffset="951859" select="false" type="linear" value="0"/>
                 <parameterKeyframe sampleOffset="952815" select="false" type="linear" value="0.65"/>
@@ -221,7 +221,7 @@
           </channelMap>
         </audioClip>
       </audioTrack>
-      <audioTrack automationLaneOpenState="false" id="10002" index="2" select="true" visible="true">
+      <audioTrack automationLaneOpenState="false" id="10002" index="2" select="false" visible="true">
         <trackParameters trackHeight="231">
           <name>Track 2</name>
         </trackParameters>
@@ -828,7 +828,7 @@
             <component id="sendPan" powered="true"/>
           </sendSlot>
         </sendList>
-        <audioClip clipAutoCrossfade="true" crossFadeHeadClipID="-1" crossFadeTailClipID="-1" endPoint="1520903" fileID="0" hue="-1" id="0" lockedInTime="false" looped="false" name="Tomasz Bednarczyk - I see you Official Video" offline="false" select="false" sourceInPoint="15556151" sourceOutPoint="15931647" startPoint="1145407" zOrder="171">
+        <audioClip clipAutoCrossfade="true" crossFadeHeadClipID="-1" crossFadeTailClipID="-1" endPoint="1335772" fileID="0" hue="-1" id="0" lockedInTime="false" looped="false" name="Tomasz Bednarczyk - I see you Official Video" offline="false" select="false" sourceInPoint="15556151" sourceOutPoint="15746516" startPoint="1145407" zOrder="181">
           <component componentID="Audition.Fader" id="clipGain" name="volume" powered="true">
             <parameter index="0" name="volume" parameterValue="0">
               <parameterKeyframes enableSplines="false">
@@ -837,7 +837,9 @@
                 <parameterKeyframe sampleOffset="15551285" select="false" type="linear" value="0"/>
                 <parameterKeyframe sampleOffset="15551411" select="false" type="linear" value="0.65"/>
                 <parameterKeyframe sampleOffset="15556151" select="false" type="linear" value="0"/>
-                <parameterKeyframe sampleOffset="15556416" select="true" type="linear" value="0.65"/>
+                <parameterKeyframe sampleOffset="15556416" select="false" type="linear" value="0.65"/>
+                <parameterKeyframe sampleOffset="15746184" select="false" type="linear" value="0.65"/>
+                <parameterKeyframe sampleOffset="15746515" select="false" type="linear" value="0"/>
                 <parameterKeyframe sampleOffset="15931288" select="false" type="linear" value="0.65"/>
                 <parameterKeyframe sampleOffset="15931643" select="false" type="linear" value="0"/>
               </parameterKeyframes>
@@ -852,9 +854,9 @@
             <parameter index="0" name="Pan" parameterValue="0"/>
           </component>
           <fadeIn crossFadeLinkType="linkedAsymmetric" endPoint="0" shape="0" startPoint="0" type="cosine"/>
-          <fadeOut crossFadeLinkType="linkedAsymmetric" endPoint="375496" shape="0" startPoint="375496" type="cosine"/>
-          <editParameter parameterIndex="0" slotIndex="4294967281"/>
+          <fadeOut crossFadeLinkType="linkedAsymmetric" endPoint="190365" shape="0" startPoint="190365" type="cosine"/>
           <editParameter parameterIndex="0" slotIndex="4294967280"/>
+          <editParameter parameterIndex="0" slotIndex="4294967281"/>
           <channelMap>
             <channel index="0" sourceIndex="0"/>
             <channel index="1" sourceIndex="1"/>
@@ -1042,8 +1044,44 @@
             <component id="sendPan" powered="true"/>
           </sendSlot>
         </sendList>
+        <audioClip clipAutoCrossfade="true" crossFadeHeadClipID="-1" crossFadeTailClipID="-1" endPoint="1534365" fileID="0" hue="-1" id="0" lockedInTime="false" looped="false" name="Tomasz Bednarczyk - I see you Official Video" offline="false" select="false" sourceInPoint="15736772" sourceOutPoint="15746516" startPoint="1524621" zOrder="198">
+          <component componentID="Audition.Fader" id="clipGain" name="volume" powered="true">
+            <parameter index="0" name="volume" parameterValue="1">
+              <parameterKeyframes enableSplines="false">
+                <parameterKeyframe sampleOffset="15539803" select="false" type="linear" value="0"/>
+                <parameterKeyframe sampleOffset="15540143" select="false" type="linear" value="0.65"/>
+                <parameterKeyframe sampleOffset="15551285" select="false" type="linear" value="0"/>
+                <parameterKeyframe sampleOffset="15551411" select="false" type="linear" value="0.65"/>
+                <parameterKeyframe sampleOffset="15556151" select="false" type="linear" value="0"/>
+                <parameterKeyframe sampleOffset="15556416" select="false" type="linear" value="0.65"/>
+                <parameterKeyframe sampleOffset="15736788" select="false" type="linear" value="0"/>
+                <parameterKeyframe sampleOffset="15737097" select="false" type="linear" value="0.65"/>
+                <parameterKeyframe sampleOffset="15746184" select="false" type="linear" value="0.65"/>
+                <parameterKeyframe sampleOffset="15746515" select="false" type="linear" value="0"/>
+                <parameterKeyframe sampleOffset="15931288" select="false" type="linear" value="0.65"/>
+                <parameterKeyframe sampleOffset="15931643" select="false" type="linear" value="0"/>
+              </parameterKeyframes>
+            </parameter>
+            <parameter index="1" name="static gain" parameterValue="1"/>
+          </component>
+          <component componentID="Audition.Mute" id="clipMute" name="Mute" powered="true">
+            <parameter index="0" parameterValue="0"/>
+            <parameter index="1" name="mute" parameterValue="0"/>
+          </component>
+          <component componentID="Audition.StereoPanner" id="clipPan" name="StereoPanner" powered="true">
+            <parameter index="0" name="Pan" parameterValue="0"/>
+          </component>
+          <fadeIn crossFadeLinkType="linkedAsymmetric" endPoint="0" shape="0" startPoint="0" type="cosine"/>
+          <fadeOut crossFadeLinkType="linkedAsymmetric" endPoint="9744" shape="0" startPoint="9744" type="cosine"/>
+          <editParameter parameterIndex="0" slotIndex="4294967280"/>
+          <editParameter parameterIndex="0" slotIndex="4294967281"/>
+          <channelMap>
+            <channel index="0" sourceIndex="0"/>
+            <channel index="1" sourceIndex="1"/>
+          </channelMap>
+        </audioClip>
       </audioTrack>
-      <audioTrack automationLaneOpenState="false" id="10006" index="6" select="false" visible="true">
+      <audioTrack automationLaneOpenState="false" id="10006" index="6" select="true" visible="true">
         <trackParameters trackHeight="231">
           <name>Track 6</name>
         </trackParameters>
@@ -1294,9 +1332,9 @@
         <editParameter parameterIndex="0" slotIndex="4294967280"/>
       </masterTrack>
     </tracks>
-    <sessionState ctiPosition="116768" smpteStart="0">
-      <selectionState selectionDuration="375606" selectionStart="9701"/>
-      <viewState horizontalViewDuration="812162" horizontalViewStart="0" trackControlsWidth="224" verticalScrollOffset="0"/>
+    <sessionState ctiPosition="1530422" smpteStart="0">
+      <selectionState selectionDuration="0" selectionStart="1530422"/>
+      <viewState horizontalViewDuration="17901" horizontalViewStart="1521154" trackControlsWidth="224" verticalScrollOffset="-596"/>
       <timeFormatState beatsPerBar="4" beatsPerMinute="120" customFrameRate="12" linkToDefaultTimeSettings="true" noteLength="4" subdivisions="16" timeCodeDropFrame="false" timeCodeFrameRate="30" timeCodeNTSC="false" timeFormat="timeFormatBarsAndBeats"/>
     </sessionState>
     <xmpMetadata><![CDATA[<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>
@@ -1306,15 +1344,15 @@
             xmlns:xmp="http://ns.adobe.com/xap/1.0/">
          <xmp:CreatorTool>Adobe Audition CS6 (Windows)</xmp:CreatorTool>
          <xmp:CreateDate>2015-07-07T22:33:46+02:00</xmp:CreateDate>
-         <xmp:MetadataDate>2015-08-07T18:45:01+02:00</xmp:MetadataDate>
-         <xmp:ModifyDate>2015-08-07T18:45:01+02:00</xmp:ModifyDate>
+         <xmp:MetadataDate>2015-08-11T21:41:37+02:00</xmp:MetadataDate>
+         <xmp:ModifyDate>2015-08-11T21:41:37+02:00</xmp:ModifyDate>
       </rdf:Description>
       <rdf:Description rdf:about=""
             xmlns:xmpMM="http://ns.adobe.com/xap/1.0/mm/"
             xmlns:stEvt="http://ns.adobe.com/xap/1.0/sType/ResourceEvent#"
             xmlns:stRef="http://ns.adobe.com/xap/1.0/sType/ResourceRef#">
-         <xmpMM:InstanceID>xmp.iid:FD68954E233DE51191EDA170E29BF93C</xmpMM:InstanceID>
-         <xmpMM:DocumentID>xmp.did:A3A68C2C213DE51191EDA170E29BF93C</xmpMM:DocumentID>
+         <xmpMM:InstanceID>xmp.iid:536A05FB6040E511A884A0F4CA9708DC</xmpMM:InstanceID>
+         <xmpMM:DocumentID>xmp.did:A8AC825D6040E511A884A0F4CA9708DC</xmpMM:DocumentID>
          <xmpMM:OriginalDocumentID>xmp.did:321C7977E724E5118646C7DAF61AA693</xmpMM:OriginalDocumentID>
          <xmpMM:History>
             <rdf:Seq>
@@ -1787,11 +1825,67 @@
                   <stEvt:softwareAgent>Adobe Audition CS6 (Windows)</stEvt:softwareAgent>
                   <stEvt:changed>/</stEvt:changed>
                </rdf:li>
+               <rdf:li rdf:parseType="Resource">
+                  <stEvt:action>saved</stEvt:action>
+                  <stEvt:instanceID>xmp.iid:A7AC825D6040E511A884A0F4CA9708DC</stEvt:instanceID>
+                  <stEvt:when>2015-08-11T21:37:13+02:00</stEvt:when>
+                  <stEvt:softwareAgent>Adobe Audition CS6 (Windows)</stEvt:softwareAgent>
+                  <stEvt:changed>/metadata</stEvt:changed>
+               </rdf:li>
+               <rdf:li rdf:parseType="Resource">
+                  <stEvt:action>saved</stEvt:action>
+                  <stEvt:instanceID>xmp.iid:A8AC825D6040E511A884A0F4CA9708DC</stEvt:instanceID>
+                  <stEvt:when>2015-08-11T21:37:13+02:00</stEvt:when>
+                  <stEvt:softwareAgent>Adobe Audition CS6 (Windows)</stEvt:softwareAgent>
+                  <stEvt:changed>/</stEvt:changed>
+               </rdf:li>
+               <rdf:li rdf:parseType="Resource">
+                  <stEvt:action>saved</stEvt:action>
+                  <stEvt:instanceID>xmp.iid:A9AC825D6040E511A884A0F4CA9708DC</stEvt:instanceID>
+                  <stEvt:when>2015-08-11T21:39:28+02:00</stEvt:when>
+                  <stEvt:softwareAgent>Adobe Audition CS6 (Windows)</stEvt:softwareAgent>
+                  <stEvt:changed>/metadata</stEvt:changed>
+               </rdf:li>
+               <rdf:li rdf:parseType="Resource">
+                  <stEvt:action>saved</stEvt:action>
+                  <stEvt:instanceID>xmp.iid:AAAC825D6040E511A884A0F4CA9708DC</stEvt:instanceID>
+                  <stEvt:when>2015-08-11T21:39:28+02:00</stEvt:when>
+                  <stEvt:softwareAgent>Adobe Audition CS6 (Windows)</stEvt:softwareAgent>
+                  <stEvt:changed>/</stEvt:changed>
+               </rdf:li>
+               <rdf:li rdf:parseType="Resource">
+                  <stEvt:action>saved</stEvt:action>
+                  <stEvt:instanceID>xmp.iid:ABAC825D6040E511A884A0F4CA9708DC</stEvt:instanceID>
+                  <stEvt:when>2015-08-11T21:39:39+02:00</stEvt:when>
+                  <stEvt:softwareAgent>Adobe Audition CS6 (Windows)</stEvt:softwareAgent>
+                  <stEvt:changed>/metadata</stEvt:changed>
+               </rdf:li>
+               <rdf:li rdf:parseType="Resource">
+                  <stEvt:action>saved</stEvt:action>
+                  <stEvt:instanceID>xmp.iid:ACAC825D6040E511A884A0F4CA9708DC</stEvt:instanceID>
+                  <stEvt:when>2015-08-11T21:39:39+02:00</stEvt:when>
+                  <stEvt:softwareAgent>Adobe Audition CS6 (Windows)</stEvt:softwareAgent>
+                  <stEvt:changed>/</stEvt:changed>
+               </rdf:li>
+               <rdf:li rdf:parseType="Resource">
+                  <stEvt:action>saved</stEvt:action>
+                  <stEvt:instanceID>xmp.iid:526A05FB6040E511A884A0F4CA9708DC</stEvt:instanceID>
+                  <stEvt:when>2015-08-11T21:41:37+02:00</stEvt:when>
+                  <stEvt:softwareAgent>Adobe Audition CS6 (Windows)</stEvt:softwareAgent>
+                  <stEvt:changed>/metadata</stEvt:changed>
+               </rdf:li>
+               <rdf:li rdf:parseType="Resource">
+                  <stEvt:action>saved</stEvt:action>
+                  <stEvt:instanceID>xmp.iid:536A05FB6040E511A884A0F4CA9708DC</stEvt:instanceID>
+                  <stEvt:when>2015-08-11T21:41:37+02:00</stEvt:when>
+                  <stEvt:softwareAgent>Adobe Audition CS6 (Windows)</stEvt:softwareAgent>
+                  <stEvt:changed>/</stEvt:changed>
+               </rdf:li>
             </rdf:Seq>
          </xmpMM:History>
          <xmpMM:DerivedFrom rdf:parseType="Resource">
-            <stRef:instanceID>xmp.iid:A2A68C2C213DE51191EDA170E29BF93C</stRef:instanceID>
-            <stRef:documentID>xmp.did:A27AB2858426E5118C07CAAAA616B78B</stRef:documentID>
+            <stRef:instanceID>xmp.iid:A7AC825D6040E511A884A0F4CA9708DC</stRef:instanceID>
+            <stRef:documentID>xmp.did:A3A68C2C213DE51191EDA170E29BF93C</stRef:documentID>
             <stRef:originalDocumentID>xmp.did:321C7977E724E5118646C7DAF61AA693</stRef:originalDocumentID>
          </xmpMM:DerivedFrom>
       </rdf:Description>

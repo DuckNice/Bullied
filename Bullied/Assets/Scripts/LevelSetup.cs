@@ -3,9 +3,44 @@ using UnityEngine;
 
 public class LevelSetup : MonoBehaviour
 {
+    private static LevelSetup _instance;
+
+    public static LevelSetup instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = GameObject.FindObjectOfType<LevelSetup>();
+
+                //Tell unity not to destroy this object when loading a new scene!
+                DontDestroyOnLoad(_instance.gameObject);
+            }
+
+            return _instance;
+        }
+    }
+
+    void Awake()
+    {
+        if (_instance == null)
+        {
+            //If I am the first instance, make me the Singleton
+            _instance = this;
+            DontDestroyOnLoad(this);
+        }
+        else
+        {
+            //If a Singleton already exists and you find
+            //another reference in scene, destroy it!
+            if (this != _instance)
+                Destroy(this.gameObject);
+        }
+    }
+
+
     public delegate void RadiusChangeHandler(int CurrentStep);
     public static event RadiusChangeHandler OnRadiusChanged;
-    public SoundManager soundManager;
 
     public delegate void StepHandler(int CurrentStep);
     public static event StepHandler OnStep;
@@ -64,8 +99,6 @@ public class LevelSetup : MonoBehaviour
 
         UpdateCirclePiece();
 
-        Bully.SceneManager = this;
-
         for (var i = 0; i < UnitsScale.Count; i++)
         {
             var unit = Instantiate(BullyPrefab);
@@ -84,12 +117,23 @@ public class LevelSetup : MonoBehaviour
     {
         if (GameOn)
         {
-            if (((stepable && Time.time > _nextStep) || _doStep) && CurrentStep < TotalSteps)
+            if ((stepable && Time.time > _nextStep) || _doStep)
             {
-                CurrentStep++;
-                OnStep(CurrentStep);
-                stepable = false;
-                _doStep = false;
+                if (CurrentStep < TotalSteps - 1)
+                {
+                    CurrentStep++;
+                    OnStep(CurrentStep);
+                    stepable = false;
+                    _doStep = false;
+                }
+                else
+                {
+                    CurrentStep++;
+                    SoundManager.instance.StopMusic();
+                    stepable = false;
+                    _doStep = false;
+
+                }
             }
         }
     }
@@ -98,12 +142,12 @@ public class LevelSetup : MonoBehaviour
     {
         GameOn = false;
         OnGameEnded();
-        soundManager.StopMusic();
+        SoundManager.instance.StopMusic();
     }
 
     public void Step()
     {
-        _nextStep += TimeBetweenSteps;
+        _nextStep = Time.time + TimeBetweenSteps;
         _radius -= _lengthOfStep;
 
         OnRadiusChanged(CurrentStep);
@@ -113,12 +157,19 @@ public class LevelSetup : MonoBehaviour
 
     public Vector3 UnitCirclePosition(int index)
     {
-        var radians = _radiansEachUnit*index;
+        if(CurrentStep < TotalSteps)
+        {
+            var radians = _radiansEachUnit*index;
 
-        var x = Mathf.Cos(radians)*_radius;
-        var y = Mathf.Sin(radians)*_radius;
+            var x = Mathf.Cos(radians)*_radius;
+            var y = Mathf.Sin(radians)*_radius;
 
-        return new Vector3(x, y, 0);
+            return new Vector3(x, y, 0);
+        }
+        else
+        {
+            return Vector3.zero;
+        }
     }
 
     private void UpdateCirclePiece()
