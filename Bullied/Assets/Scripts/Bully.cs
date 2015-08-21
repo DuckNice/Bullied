@@ -27,22 +27,35 @@ public class Bully : MonoBehaviour
 	            <
                 LevelSetup.instance.CirclePiece + LevelSetup.instance.AttackTolerance)
 	        {
-                var travel = (Vector3.Distance(LevelSetup.instance.UnitCirclePosition(CircleNumber), transform.position) +
-                              (LevelSetup.instance.AttackSpeed * Time.deltaTime)) /
-                             Vector3.Distance(LevelSetup.instance.UnitCirclePosition(CircleNumber),
-                                 LevelSetup.instance.Player.transform.position);
+                float speed = LevelSetup.instance.AttackSpeed * Time.deltaTime;
+                float distx = transform.position.x - LevelSetup.instance.Player.transform.position.x;
+                float disty = transform.position.y - LevelSetup.instance.Player.transform.position.y;
 
-                transform.position = Vector3.Lerp(LevelSetup.instance.UnitCirclePosition(CircleNumber),
-                    LevelSetup.instance.Player.transform.position, travel);
+                Vector3 travel = new Vector3(distx, disty, 0);
+
+                transform.position -= travel.normalized * speed;
+                LevelSetup.instance.BullyStepped[CircleNumber] = true;
 	        }
 	        else
 	        {
                 if (Vector3.Distance(LevelSetup.instance.UnitCirclePosition(CircleNumber), transform.position) >
                     LevelSetup.instance.Tolerance)
 	            {
-                    transform.position += (LevelSetup.instance.UnitCirclePosition(CircleNumber) - transform.position) *
-                                          LevelSetup.instance.StepSpeed * Time.deltaTime;
-	            }
+                    if(LevelSetup.instance.BullyStepped[CircleNumber]){
+                        transform.position += (LevelSetup.instance.UnitCirclePosition(CircleNumber) - transform.position) *
+                                              LevelSetup.instance.WalkSpeed * Time.deltaTime;
+	                }
+                    else
+                    {
+                        transform.position += (LevelSetup.instance.UnitCirclePosition(CircleNumber) - transform.position) *
+                                              LevelSetup.instance.StepSpeed * Time.deltaTime;
+                        if (Vector3.Distance(LevelSetup.instance.UnitCirclePosition(CircleNumber), transform.position) <
+                            LevelSetup.instance.StepTolerance)
+                        {
+                            LevelSetup.instance.BullyStepped[CircleNumber] = true;
+                        }
+                    }
+                }
 	        }
 
             CalculateNewRotation();

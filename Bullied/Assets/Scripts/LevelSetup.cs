@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
 
 public class LevelSetup : MonoBehaviour
 {
@@ -60,16 +61,25 @@ public class LevelSetup : MonoBehaviour
     public GameObject BullyPrefab;
     public GameObject Player;
     public float StepSpeed;
+    public float WalkSpeed;
+    private float _startSize;
     public float TimeBetweenSteps;
-    public float Tolerance = 0.02f;
+    [SerializeField]
+    private float _playerGrowFactor = 3;
+    public float Tolerance = 0;
+    public float StepTolerance = 0.02f;
     private bool stepable = true;
     public int TotalSteps = 4;
+    [SerializeField] private float _bullyEndSize = 4;
+    [SerializeField] private AnimationCurve _bullySizeScale;
+    [SerializeField] private float _bullyGrowSpeed;
     [SerializeField] private float _innerRadiusScreenFactor = 0.3f;
     public List<float> UnitsScale = new List<float>();
     public float CirclePiece { get; private set; }
     public static bool GameOn { get; private set; }
     public int CurrentStep { get; private set; }
     public List<Vector2> BullyPositions { get; private set; }
+    [HideInInspector] public List<bool> BullyStepped = new List<bool>();
 
     private void OnEnable()
     {
@@ -78,9 +88,12 @@ public class LevelSetup : MonoBehaviour
         for (var i = UnitsScale.Count - 1; i >= 0; i--)
         {
             BullyPositions.Add(UnitCirclePosition(i));
+            BullyStepped.Add(true);
         }
 
         _nextStep = TimeBetweenSteps;
+
+        _startSize = Camera.main.orthographicSize;
     }
 
     private void Start()
@@ -123,13 +136,16 @@ public class LevelSetup : MonoBehaviour
                 {
                     CurrentStep++;
                     OnStep(CurrentStep);
+                    StartCoroutine(GrowBullies());
                     stepable = false;
                     _doStep = false;
                 }
                 else
                 {
                     CurrentStep++;
+                    
                     SoundManager.instance.StopMusic();
+                    UpdateCirclePiece();
                     stepable = false;
                     _doStep = false;
 
@@ -153,23 +169,41 @@ public class LevelSetup : MonoBehaviour
         OnRadiusChanged(CurrentStep);
         UpdateCirclePiece();
         stepable = true;
+        for (int i = BullyStepped.Count - 1; i >= 0; i-- )
+        {
+            BullyStepped[i] = false;
+        }
+    }
+
+    public IEnumerator GrowBullies()
+    {
+        float sizePoint = _bullySizeScale.Evaluate(((float)CurrentStep / TotalSteps)) * _bullyEndSize;
+
+        float newSize = _startSize - sizePoint;
+        
+        while(true)
+        {
+            float mbox = _bullyGrowSpeed * Time.fixedDeltaTime;
+            Camera.main.orthographicSize -= mbox;
+            Player.transform.localScale -= new Vector3(mbox / _playerGrowFactor, mbox / _playerGrowFactor, mbox / _playerGrowFactor);
+
+            if (newSize >= Camera.main.orthographicSize)
+            {
+                break;
+            }
+
+            yield return new WaitForFixedUpdate();
+        }
     }
 
     public Vector3 UnitCirclePosition(int index)
     {
-        if(CurrentStep < TotalSteps)
-        {
-            var radians = _radiansEachUnit*index;
+        var radians = _radiansEachUnit*index;
 
-            var x = Mathf.Cos(radians)*_radius;
-            var y = Mathf.Sin(radians)*_radius;
+        var x = Mathf.Cos(radians)*_radius;
+        var y = Mathf.Sin(radians)*_radius;
 
-            return new Vector3(x, y, 0);
-        }
-        else
-        {
-            return Vector3.zero;
-        }
+        return new Vector3(x, y, 0);
     }
 
     private void UpdateCirclePiece()

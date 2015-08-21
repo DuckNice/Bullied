@@ -124,8 +124,7 @@ public class Player : MonoBehaviour
     private void OnTriggerStay(Collider bully)
     {
         if (LevelSetup.GameOn)
-        {
-
+        {            
             if (HitBully(new Vector2(bully.transform.position.x, bully.transform.position.y),
                 bully.gameObject == _lastBullyHit))
             {
