@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Linq;
 
 public class Bully : MonoBehaviour
 {
@@ -16,7 +17,6 @@ public class Bully : MonoBehaviour
         LevelSetup.instance.UnitCirclePosition(CircleNumber);
     }
 
-    
 	void Update ()
     {
 	    if (LevelSetup.GameOn)
@@ -25,9 +25,14 @@ public class Bully : MonoBehaviour
                 Vector3.Distance(LevelSetup.instance.UnitCirclePosition(CircleNumber),
                     LevelSetup.instance.Player.transform.position)
 	            <
-                LevelSetup.instance.CirclePiece + LevelSetup.instance.AttackTolerance)
+                LevelSetup.instance.CirclePiece + LevelSetup.instance.BullyAttackTolerance 
+                    &&
+                !LevelSetup.instance.bulliesHitWithinDuration.Exists(x => x.bully == this)
+                    &&
+                    (LevelSetup.instance.CurrentStep < LevelSetup.instance.TotalSteps)
+                )
 	        {
-                float speed = LevelSetup.instance.AttackSpeed * Time.deltaTime;
+                float speed = LevelSetup.instance.BullyAttackSpeed * Time.deltaTime;
                 float distx = transform.position.x - LevelSetup.instance.Player.transform.position.x;
                 float disty = transform.position.y - LevelSetup.instance.Player.transform.position.y;
 
@@ -39,7 +44,7 @@ public class Bully : MonoBehaviour
 	        else
 	        {
                 if (Vector3.Distance(LevelSetup.instance.UnitCirclePosition(CircleNumber), transform.position) >
-                    LevelSetup.instance.Tolerance)
+                    LevelSetup.instance.BullyCirclePositionTolerance)
 	            {
                     if(LevelSetup.instance.BullyStepped[CircleNumber]){
                         transform.position += (LevelSetup.instance.UnitCirclePosition(CircleNumber) - transform.position) *
@@ -50,7 +55,7 @@ public class Bully : MonoBehaviour
                         transform.position += (LevelSetup.instance.UnitCirclePosition(CircleNumber) - transform.position) *
                                               LevelSetup.instance.StepSpeed * Time.deltaTime;
                         if (Vector3.Distance(LevelSetup.instance.UnitCirclePosition(CircleNumber), transform.position) <
-                            LevelSetup.instance.StepTolerance)
+                            LevelSetup.instance.BullyStepTolerance)
                         {
                             LevelSetup.instance.BullyStepped[CircleNumber] = true;
                         }
@@ -77,5 +82,4 @@ public class Bully : MonoBehaviour
 
         gameObject.transform.Rotate(Vector3.forward, Mathf.Rad2Deg * angle);
     }
-
 }

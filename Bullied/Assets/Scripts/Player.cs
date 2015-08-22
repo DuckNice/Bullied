@@ -1,15 +1,25 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Player : MonoBehaviour
 {
+    #region debug
+    [SerializeField]
+    private bool _moveWhilePushed = true;
+    #endregion
+
     public float CenterTolerance;
     private Vector3 _direction = new Vector3(0, 0, 0);
-    public float FallSpeed;
+    public float FallSpeed = 7;
+    public float EndFallSpeed = 5;
+    public AnimationCurve FallSpeedCurve;
+
     public int HurtDivisor = 2;
-    private GameObject _lastBullyHit;
     private bool _playerControl = true;
     public float PlayerSpeed;
+    private Rigidbody _playerRig;
+    
 
     #region player movement disability
         [SerializeField] private Vector3 _shakeStartHitsAmount;
@@ -25,21 +35,33 @@ public class Player : MonoBehaviour
         [SerializeField] private float _shakeSpeed;
     #endregion
 
-    public bool HitBully(Vector2 bullyPosition, bool sameBully)
+        [SerializeField]
+        private float bullyHitSaveDur = 3;
+
+    public void Awake()
+    {
+        _playerRig = GetComponent<Rigidbody>();
+    }
+
+    public bool HitBully(Vector2 bullyPosition, GameObject bully)
     {
         if (LevelSetup.GameOn)
         {
-            if (_playerControl || !sameBully)
+            if (_playerControl || !LevelSetup.instance.bulliesHitWithinDuration.Exists(x => x.bully == bully))
             {
                 _playerControl = false;
-
                 _direction = Vector3.zero - transform.position;
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
-                GetComponent<Rigidbody>().velocity = (_direction * FallSpeed);
 
+                float fallSpeed = FallSpeedCurve.Evaluate((float)LevelSetup.instance.CurrentStep / LevelSetup.instance.TotalSteps);
+
+                _playerRig.velocity = (_direction * ((EndFallSpeed * fallSpeed) + ((1-fallSpeed) * FallSpeed)));
+
+                LevelSetup.instance.bulliesHitWithinDuration.Add(new LevelSetup.BullyHitContainer(bully, Time.time));
                 return true;
             }
         }
+
+        
 
         return false;
     }
@@ -72,7 +94,7 @@ public class Player : MonoBehaviour
             }
             else
             {
-                if (!(GetComponent<Rigidbody>().velocity.magnitude < 0.02f) && _waitStart < 0.0f)
+                if (!(_playerRig.velocity.magnitude < 0.02f) && _waitStart < 0.0f)
                 {
                     _waitStart = Time.time;
                 }
@@ -82,13 +104,31 @@ public class Player : MonoBehaviour
                     GetComponent<Rigidbody>().velocity = Vector3.zero;
                     _waitStart = -1;
                 }
+
+                if(_moveWhilePushed)
+                {
+                    
+                }
+            }
+        }
+        else
+        {
+            _playerRig.velocity = Vector3.zero;
+        }
+
+        for (int i = LevelSetup.instance.bulliesHitWithinDuration.Count - 1; i >= 0; i-- )
+        {
+            if (LevelSetup.instance.bulliesHitWithinDuration[i].time + bullyHitSaveDur <= Time.time)
+            {
+                LevelSetup.instance.bulliesHitWithinDuration.RemoveAt(i);
             }
         }
 
-        if(!_hitBullyOnUpdate)
+        if (!_hitBullyOnUpdate)
         {
             _isHittingBully = false;
         }
+        
         _hitBullyOnUpdate = false;
     }
 
@@ -126,9 +166,8 @@ public class Player : MonoBehaviour
         if (LevelSetup.GameOn)
         {            
             if (HitBully(new Vector2(bully.transform.position.x, bully.transform.position.y),
-                bully.gameObject == _lastBullyHit))
+                bully.gameObject))
             {
-                _lastBullyHit = bully.gameObject;
                 if (LevelSetup.instance.CurrentStep >= _slowStartStep && !_isHittingBully)
                 {
                     _slowHitCounter++;

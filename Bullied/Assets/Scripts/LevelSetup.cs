@@ -49,43 +49,80 @@ public class LevelSetup : MonoBehaviour
     public delegate void GameEndedHandler();
     public static event GameEndedHandler OnGameEnded;
 
-    [SerializeField] private bool _doStep = false;
+    #region debug
+    [SerializeField]
+    private bool _doStep = false;
+    #endregion
 
-    [SerializeField] private float _radiusScreenFactor = 1;
+    #region player
+    public GameObject Player;
+    [SerializeField]
+    private float _playerGrowFactor = 3;
+    #endregion
+
+    #region bully
+    public GameObject BullyPrefab;
+
+    public List<float> BullyScales = new List<float>();
+    public List<Vector2> BullyPositions { get; private set; }
+    [HideInInspector]
+    public List<bool> BullyStepped = new List<bool>();
+
+    public float BullyAttackSpeed = 8;
+    public float BullyAttackTolerance = 0.3f;
+    public float BullyCirclePositionTolerance = 0;
+    public float WalkSpeed = 3;
+    public float StepSpeed = 10;
+    public int TotalSteps = 5;
+    public float TimeBetweenSteps = 20;
+    public float BullyStepTolerance = 0.02f;
+    [SerializeField]
+    private AnimationCurve _bullyGrowCurve;
+    [SerializeField]
+    private float _bullyGrowSpeed = 0.5f;
+    #endregion
+
+    #region gameProgress
+    [SerializeField]
+    private float _radiusStartFactor = 0.9f;
+    [SerializeField]
+    private float _radiusEndFactor = 0.1f;
+    [SerializeField]
+    private float _endScreenZoom = 4;
+    private float _cameraStartSize;
+    public float CirclePiece { get; private set; }
+
     private float _lengthOfStep;
     private float _nextStep;
     private float _radiansEachUnit;
     private float _radius;
-    public float AttackSpeed;
-    public float AttackTolerance;
-    public GameObject BullyPrefab;
-    public GameObject Player;
-    public float StepSpeed;
-    public float WalkSpeed;
-    private float _startSize;
-    public float TimeBetweenSteps;
-    [SerializeField]
-    private float _playerGrowFactor = 3;
-    public float Tolerance = 0;
-    public float StepTolerance = 0.02f;
-    private bool stepable = true;
-    public int TotalSteps = 4;
-    [SerializeField] private float _bullyEndSize = 4;
-    [SerializeField] private AnimationCurve _bullySizeScale;
-    [SerializeField] private float _bullyGrowSpeed;
-    [SerializeField] private float _innerRadiusScreenFactor = 0.3f;
-    public List<float> UnitsScale = new List<float>();
-    public float CirclePiece { get; private set; }
-    public static bool GameOn { get; private set; }
     public int CurrentStep { get; private set; }
-    public List<Vector2> BullyPositions { get; private set; }
-    [HideInInspector] public List<bool> BullyStepped = new List<bool>();
+    private bool stepable = true;
+    public static bool GameOn { get; private set; }
+    #endregion
+
+    #region shouldBullyGoForPlayer
+    public List<BullyHitContainer> bulliesHitWithinDuration = new List<BullyHitContainer>();
+
+    public struct BullyHitContainer
+    {
+        public BullyHitContainer(GameObject bully, float time)
+        {
+            this.bully = bully;
+            this.time = time;
+        }
+
+        public GameObject bully;
+        public float time;
+    }
+    #endregion
+
 
     private void OnEnable()
     {
         BullyPositions = new List<Vector2>();
 
-        for (var i = UnitsScale.Count - 1; i >= 0; i--)
+        for (var i = BullyScales.Count - 1; i >= 0; i--)
         {
             BullyPositions.Add(UnitCirclePosition(i));
             BullyStepped.Add(true);
@@ -93,7 +130,7 @@ public class LevelSetup : MonoBehaviour
 
         _nextStep = TimeBetweenSteps;
 
-        _startSize = Camera.main.orthographicSize;
+        _cameraStartSize = Camera.main.orthographicSize;
     }
 
     private void Start()
@@ -103,18 +140,19 @@ public class LevelSetup : MonoBehaviour
         SoundManager.OnTrackChanged += Step;
 
         var dimensions = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
-        _radius = (dimensions.x < dimensions.y) ? dimensions.x*_radiusScreenFactor : dimensions.y*_radiusScreenFactor;
-        var _innerRadius = (dimensions.x < dimensions.y) ? dimensions.x * _innerRadiusScreenFactor : dimensions.y * _innerRadiusScreenFactor;
+        _radius = (dimensions.x < dimensions.y) ? dimensions.x*_radiusStartFactor : dimensions.y*_radiusStartFactor;
+        var _innerRadius = (dimensions.x < dimensions.y) ? dimensions.x * _radiusEndFactor : dimensions.y * _radiusEndFactor;
 
         _lengthOfStep = (_radius - _innerRadius)/TotalSteps;
 
-        _radiansEachUnit = (2*Mathf.PI)/UnitsScale.Count;
+        _radiansEachUnit = (2*Mathf.PI)/BullyScales.Count;
 
         UpdateCirclePiece();
 
-        for (var i = 0; i < UnitsScale.Count; i++)
+        for (var i = 0; i < BullyScales.Count; i++)
         {
             var unit = Instantiate(BullyPrefab);
+            unit.transform.localScale = new Vector3(BullyScales[i], BullyScales[i], BullyScales[i]);
             var bullyScript = unit.GetComponent<Bully>();
             bullyScript.CircleNumber = i;
             bullyScript.Init();
@@ -177,9 +215,9 @@ public class LevelSetup : MonoBehaviour
 
     public IEnumerator GrowBullies()
     {
-        float sizePoint = _bullySizeScale.Evaluate(((float)CurrentStep / TotalSteps)) * _bullyEndSize;
+        float sizePoint = _bullyGrowCurve.Evaluate(((float)CurrentStep / TotalSteps)) * _endScreenZoom;
 
-        float newSize = _startSize - sizePoint;
+        float newSize = _cameraStartSize - sizePoint;
         
         while(true)
         {
