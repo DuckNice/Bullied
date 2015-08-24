@@ -67,6 +67,7 @@ public class SoundManager : MonoBehaviour
     public void StopMusic()
     {
         StartCoroutine(FadeSounds());
+        OnTrackChanged();
     }
 
     void SetInGameMusicTrack(int currentStep)
@@ -164,8 +165,5 @@ public class SoundManager : MonoBehaviour
         BuildupSource.Stop();
         ClimaxSource.Stop();
         EncoreSource.Stop();
-
-        OnTrackChanged();
-
     }
 }
